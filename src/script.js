@@ -41,6 +41,17 @@ function rect(r) {
   ctx.strokeRect(r.x,r.y,r.width,r.height);
   ctx.fillStyle=r.fill;
   ctx.fillRect(r.x,r.y,r.width,r.height);
+
+  if(r.isSelected) {
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle="#FFFFFF";
+        ctx.fillRect(r.x,r.y,r.width,r.height);
+        //ctx.globalAlpha = 1;
+        //ctx.lineWidth = 3;
+        //ctx.strokeStyle="#FFFF00";
+        //ctx.strokeRect(r.x,r.y,r.width,r.height);
+  }
+
   ctx.globalAlpha = 1.0;
   ctx.lineWidth = 1;
   ctx.font = "bold 24px Arial";
@@ -73,16 +84,11 @@ function draw() {
         ctx.stroke(); 
     }
     ctx.globalAlpha = 1.0;
-
   
   // redraw each shape in the shapes[] array
   for(var i=0;i<shapes.length;i++){
-    // decide if the shape is a rect or circle
-    // (it's a rect if it has a width property)
     if(shapes[i].width){
       rect(shapes[i]);
-    }else{
-      circle(shapes[i]);
     };
   }
 }
@@ -103,6 +109,9 @@ function myDown(e){
   dragok=false;
   for(var i=0;i<shapes.length;i++){
     var s=shapes[i];
+	if (!e.shiftKey) {
+		s.isSelected=false;
+	}
     // decide if the shape is a rect or circle               
     if(s.width){
       // test if the mouse is inside this rect
@@ -110,17 +119,12 @@ function myDown(e){
         // if yes, set that rects isDragging=true
         dragok=true;
         s.isDragging=true;
-      }
-    }else{
-      var dx=s.x-mx;
-      var dy=s.y-my;
-      // test if the mouse is inside this circle
-      if(dx*dx+dy*dy<s.r*s.r){
-        dragok=true;
-        s.isDragging=true;
-      }
+        s.isSelected=true;
+        }
     }
   }
+
+  draw();
   // save the current mouse position
   startX=mx;
   startY=my;
@@ -138,6 +142,7 @@ function myUp(e){
   for(var i=0;i<shapes.length;i++){
     shapes[i].isDragging=false;
   }
+  draw();
 }
 
 // handle mouse moves
@@ -169,7 +174,7 @@ function myMove(e){
     // since the last mousemove
     for(var i=0;i<shapes.length;i++){
       var s=shapes[i];
-      if(s.isDragging){
+      if(s.isDragging || s.isSelected){
         s.x+=dx;
         s.y+=dy;
       }
