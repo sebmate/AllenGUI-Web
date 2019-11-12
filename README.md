@@ -1,2 +1,3 @@
 # AllenGUI-Web
-AllenGUI JavaScript Version
+This will be the next AllenGUI version, implemented in JavaScript. Work in progress!
+ 

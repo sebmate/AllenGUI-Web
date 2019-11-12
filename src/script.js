@@ -18,8 +18,8 @@ var lastSelected = -1;
 // an array of objects that define different shapes
 var shapes = [];
 // define 2 rectangles
-shapes.push({x: 10, y: 10, width: 200, height: 30, fill: "#0000FF", isDragging: false, label: "Interval A", isConnector: false});
-shapes.push({x: 10, y: 50, width: 200, height: 30, fill: "#333333", isDragging: false, label: "Interval B", isConnector: false});
+shapes.push({x: 10, y: 10, width: 200, height: 30, fill: "#0000FF", isDragging: false, label: "Interval A", isConnector: false, fuzzy: 0});
+shapes.push({x: 10, y: 50, width: 200, height: 30, fill: "#333333", isDragging: false, label: "Interval B", isConnector: false, fuzzy: 0});
 
 // listen for mouse events
 canvas.onmousedown = myDown;
@@ -31,13 +31,13 @@ draw();
 
 function AddInterval() {
 	deselectAll();
-    shapes.push({x: 10, y: 10, width: 200, height: 30, fill: "#0000FF", isDragging: false, label: "New Interval", isConnector: false, isSelected: false});
+    shapes.push({x: 10, y: 10, width: 200, height: 30, fill: "#0000FF", isDragging: false, label: "New Interval", isConnector: false, isSelected: false, fuzzy: 0});
     draw();
 }
 
 function AddConnector() {
 	deselectAll();
-    shapes.push({x: 10, y: 10, width: 50, height: 10, fill: "#FFAA00", isDragging: false, label: "New Interval", isConnector: true, isSelected: false});
+    shapes.push({x: 10, y: 10, width: 50, height: 10, fill: "#FFAA00", isDragging: false, label: "New Interval", isConnector: true, isSelected: false, fuzzy: -1});
     draw();
 }
 
@@ -79,8 +79,24 @@ function rect(r) {
 	ctx.strokeStyle = "#000000";
 	ctx.strokeRect(r.x, r.y, r.width, r.height);
 	
-    ctx.globalAlpha = 1.0;
 
+    
+    // Fuzzyness:
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = "#FFFFFF";
+     if (r.fuzzy == 1 || r.fuzzy == 3) {
+        ctx.fillRect(r.x + r.width - 15, r.y+1, 15 + 1, 30-2);
+        ctx.fillRect(r.x + r.width - 10, r.y+1, 10 + 1, 30-2);
+        ctx.fillRect(r.x + r.width - 5 , r.y+1, 5 + 1, 30-2);
+    }
+    if (r.fuzzy == 2 || r.fuzzy == 3) {
+        ctx.fillRect(r.x - 1, r.y+1, 15, 30-2);
+        ctx.fillRect(r.x - 1, r.y+1, 10, 30-2);
+        ctx.fillRect(r.x - 1, r.y+1, 5, 30-2);
+    }
+
+    ctx.globalAlpha = 1.0;
+    
     // text label:
 	if(r.isConnector == false) {
 		ctx.fillText(r.label, r.x + (r.width / 2), r.y + 23);
@@ -250,6 +266,16 @@ function myMove(e) {
         startX = mx;
         startY = my;
     }
+}
+
+function SetFuzzyness(fuzz) {
+    for (var i = 0; i < shapes.length; i++) {
+        var s = shapes[i];
+        if (s.isSelected) {
+            s.fuzzy = fuzz;
+        }
+    }
+    draw();
 }
 
 function Rename() {
